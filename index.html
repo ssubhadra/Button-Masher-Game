@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button Mashing Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .setup-screen {
+            display: block;
+        }
+
+        .game-screen {
+            display: none;
+        }
+
+        .results-screen {
+            display: none;
+        }
+
+        .selection-group {
+            margin: 20px 0;
+        }
+
+        .selection-group h3 {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            min-width: 60px;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .option-btn.selected {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(238, 90, 36, 0.4);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(238, 90, 36, 0.6);
+        }
+
+        .start-btn:disabled {
+            background: gray;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .info-card h4 {
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .info-card .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .timer {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 30px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .timer.warning {
+            color: #ff6b6b;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .key-display {
+            font-size: 3em;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-transform: uppercase;
+        }
+
+        .results {
+            margin: 20px 0;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .accuracy {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .play-again-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .play-again-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(68, 160, 141, 0.4);
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .game-info {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .timer {
+                font-size: 3em;
+            }
+
+            .key-display {
+                font-size: 2.5em;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Setup Screen -->
+        <div class="setup-screen" id="setupScreen">
+            <h1>🎮 Button Mashing Game</h1>
+            
+            <div class="instructions">
+                <strong>How to play:</strong><br>
+                1. Choose your timer and key to mash<br>
+                2. Click Start and get ready!<br>
+                3. Mash your chosen key as fast as possible<br>
+                4. Try to get the highest accuracy score!
+            </div>
+
+            <div class="selection-group">
+                <h3>⏱️ Choose Timer</h3>
+                <div class="button-group">
+                    <button class="option-btn timer-btn" data-time="60">60s</button>
+                    <button class="option-btn timer-btn" data-time="90">90s</button>
+                    <button class="option-btn timer-btn" data-time="120">120s</button>
+                </div>
+            </div>
+
+            <div class="selection-group">
+                <h3>⌨️ Choose Key</h3>
+                <div class="button-group">
+                    <button class="option-btn key-btn" data-key="a">A</button>
+                    <button class="option-btn key-btn" data-key="s">S</button>
+                    <button class="option-btn key-btn" data-key="w">W</button>
+                </div>
+            </div>
+
+            <button class="start-btn" id="startBtn" disabled>Start Game</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-screen" id="gameScreen">
+            <h1>🎮 Mash Time!</h1>
+            
+            <div class="timer" id="gameTimer">60</div>
+            
+            <div class="key-display" id="keyDisplay">A</div>
+            
+            <div class="game-info">
+                <div class="info-card">
+                    <h4>Total Presses</h4>
+                    <div class="value" id="totalPresses">0</div>
+                </div>
+                <div class="info-card">
+                    <h4>Correct Presses</h4>
+                    <div class="value" id="correctPresses">0</div>
+                </div>
+                <div class="info-card">
+                    <h4>Accuracy</h4>
+                    <div class="value" id="liveAccuracy">100%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen" id="resultsScreen">
+            <h1>🏆 Game Over!</h1>
+            
+            <div class="results">
+                <div class="result-item">
+                    <span>Time Duration:</span>
+                    <span id="finalTime">60 seconds</span>
+                </div>
+                <div class="result-item">
+                    <span>Total Key Presses:</span>
+                    <span id="finalTotal">0</span>
+                </div>
+                <div class="result-item">
+                    <span>Correct Presses:</span>
+                    <span id="finalCorrect">0</span>
+                </div>
+                <div class="result-item">
+                    <span>Wrong Presses:</span>
+                    <span id="finalWrong">0</span>
+                </div>
+                <div class="result-item">
+                    <span>Keys Per Second:</span>
+                    <span id="finalKPS">0.0</span>
+                </div>
+            </div>
+            
+            <div class="accuracy" id="finalAccuracy">100%</div>
+            
+            <button class="play-again-btn" id="playAgainBtn">Play Again</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
