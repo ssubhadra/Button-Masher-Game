@@ -47,15 +47,19 @@ def start_game():
     timer_label = ttk.Label(game_window, text=f"Time left: {seconds_left.get()}s", font=("Helvetica", 14))
     timer_label.pack(pady=10)
 
-    def handle_keypress(event):
-        if not key_is_held.get():
-            key_is_held.set(True)
-            total_presses.set(total_presses.get() + 1)
-            if event.char.lower() == selected_key:
-                correct_presses.set(correct_presses.get() + 1)
-            status_label.config(
-                text=f"Presses: {total_presses.get()} | Correct: {correct_presses.get()}"
-            )
+   def handle_keypress(event):
+    if not key_is_held.get():
+        key_is_held.set(True)
+        total_presses.set(total_presses.get() + 1)
+
+        key_pressed = event.char.lower() if event.char else ""  # Safely get character
+
+        if key_pressed == selected_key:
+            correct_presses.set(correct_presses.get() + 1)
+
+        status_label.config(
+            text=f"Presses: {total_presses.get()} | Correct: {correct_presses.get()}"
+        )
 
     def handle_keyrelease(event):
         key_is_held.set(False)
